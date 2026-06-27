@@ -1,0 +1,2 @@
+# No external packages are required!
+# The ranking pipeline is implemented using Python standard libraries (json, csv, time, argparse, sys, datetime, hashlib) for maximum performance, compatibility, and zero-dependency environment compliance.

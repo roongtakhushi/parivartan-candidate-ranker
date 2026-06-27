@@ -1,0 +1,19 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data files (exclude 487MB candidates dataset)
+judges dataset/
+candidates.jsonl
+candidates.jsonl.gz
+
+# Local/IDE configs
+.idea/
+.vscode/
+.gemini/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
