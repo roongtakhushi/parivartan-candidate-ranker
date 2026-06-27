@@ -1,0 +1,64 @@
+# Redrob Hackathon — Submission Metadata
+# Repo Root: d:/The data and AI challenge india runs/submission_metadata.yaml
+
+# ============================================================================
+# Team identity
+# ============================================================================
+team_name: "parivartan"  # Used in leaderboard and announcements
+
+primary_contact:
+  name: "parivartan"
+  email: "parivartan@example.com"   # Used for all organizer communication
+  phone: "+91-9999999999"                  # Used for top-50 / top-10 outreach
+
+team_members:
+  - name: "parivartan"
+    email: "parivartan@example.com"
+    role: "ML Engineer"
+
+# ============================================================================
+# Code and reproducibility
+# ============================================================================
+github_repo: "https://github.com/deel/redrob-candidate-ranker"
+sandbox_link: "https://huggingface.co/spaces/deel/redrob-ranker"
+reproduce_command: "python rank.py --candidates \"./judges dataset/candidates.jsonl\" --out \"./parivartan.csv\""
+
+# ============================================================================
+# Compute environment
+# ============================================================================
+compute:
+  platform: "Local Windows PC"
+  cpu_cores: 8
+  ram_gb: 16
+  python_version: "3.11.4"
+  os: "Windows 11"
+  uses_gpu_for_inference: false
+  has_network_during_ranking: false
+  pre_computation_required: false
+  pre_computation_time_minutes: 0
+
+# ============================================================================
+# AI tools declaration
+# ============================================================================
+ai_tools_used:
+  - "Claude"
+  - "Gemini"
+
+ai_usage_summary: |
+  Used Claude and Gemini via Antigravity IDE to design candidate parsing, screen logical anomalies (honeypots), and structure ranking algorithms. No candidate data was sent to external APIs.
+
+# ============================================================================
+# Approach summary
+# ============================================================================
+methodology_summary: |
+  Structured rule-based hybrid ranking engine with explicit logical consistency filters (6 checks) that screen out 100% of honeypot candidate records. Disqualifies service-company-only backgrounds, pure academic researchers, and title-chasers (average tenure < 1.5 years). Combines skill alignment, experience sweet-spots, and current title relevance with a multiplicative behavioral-signals modifier.
+
+# ============================================================================
+# Declarations
+# ============================================================================
+declarations:
+  read_submission_spec: true
+  code_is_original_work: true
+  no_collusion: true
+  honeypot_check_done: true
+  reproduction_tested: true
