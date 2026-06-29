@@ -59,7 +59,7 @@ def is_honeypot(cand):
     
     # 1. Expert/Advanced skill with 0 duration
     for s in skills:
-        lvl = str(s.get("level", "")).lower()
+        lvl = str(s.get("proficiency", s.get("level", ""))).lower()
         dur = s.get("duration_months", 0)
         if lvl in ("expert", "advanced") and dur == 0:
             return True, f"Skill duration anomaly: expert/advanced skill '{s.get('name')}' has 0 months duration."
@@ -94,6 +94,8 @@ def is_honeypot(cand):
 
     # 5. Assessment for missing skill
     assessment = cand.get("platform_assessment", {})
+    if not assessment:
+        assessment = cand.get("redrob_signals", {}).get("skill_assessment_scores", {})
     if assessment:
         skill_names = {str(s.get("name", "")).strip().lower() for s in skills if s.get("name")}
         for ass_skill in assessment.keys():
@@ -235,7 +237,7 @@ def extract_features(cand):
     skills_dict = {}
     for s in skills:
         name = s.get("name", "").strip()
-        lvl = s.get("level", "").strip()
+        lvl = s.get("proficiency", s.get("level", "")).strip()
         dur = s.get("duration_months", 0)
         skills_dict[name.lower()] = {
             "name": name,

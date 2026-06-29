@@ -7,20 +7,26 @@
 team_name: "parivartan"  # Used in leaderboard and announcements
 
 primary_contact:
-  name: "parivartan"
-  email: "parivartan@example.com"   # Used for all organizer communication
-  phone: "+91-9999999999"                  # Used for top-50 / top-10 outreach
+  name: "Khushi Roongta"
+  email: "khushiroongta0801@gmail.com"   # Used for all organizer communication
+  phone: "+91-7620503376"                  # Used for top-50 / top-10 outreach
 
 team_members:
-  - name: "parivartan"
-    email: "parivartan@example.com"
-    role: "ML Engineer"
+  - name: "Khushi Roongta"
+    email: "khushiroongta0801@gmail.com"
+    role: "Student Lead - ML Pipeline & Architecture"
+  - name: "Lucky Jadhav"
+    email: "luckymanojjadhav@gmail.com"
+    role: "Student Developer - Data Analysis & Cleansing"
+  - name: "Yash Deshpande"
+    email: "yash656deshpande@gmail.com"
+    role: "Student Developer - Web UI & Sandbox"
 
 # ============================================================================
 # Code and reproducibility
 # ============================================================================
-github_repo: "https://github.com/deel/redrob-candidate-ranker"
-sandbox_link: "https://huggingface.co/spaces/deel/redrob-ranker"
+github_repo: "TODO: To be provided by participant"
+sandbox_link: "TODO: To be provided by participant"
 reproduce_command: "python rank.py --candidates \"./judges dataset/candidates.jsonl\" --out \"./parivartan.csv\""
 
 # ============================================================================
@@ -51,7 +57,7 @@ ai_usage_summary: |
 # Approach summary
 # ============================================================================
 methodology_summary: |
-  Structured rule-based hybrid ranking engine with explicit logical consistency filters (6 checks) that screen out 100% of honeypot candidate records. Disqualifies service-company-only backgrounds, pure academic researchers, and title-chasers (average tenure < 1.5 years). Combines skill alignment, experience sweet-spots, and current title relevance with a multiplicative behavioral-signals modifier.
+  Structured rule-based hybrid ranking engine with explicit logical consistency filters (9 checks) that screen out 100% of honeypot candidate records. Disqualifies service-company-only backgrounds, pure academic researchers, and title-chasers (average tenure < 1.5 years). Combines skill alignment, experience sweet-spots, and current title relevance with a multiplicative behavioral-signals modifier.
 
 # ============================================================================
 # Declarations

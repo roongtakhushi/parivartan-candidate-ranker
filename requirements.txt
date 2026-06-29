@@ -1,2 +1,4 @@
-# No external packages are required!
-# The ranking pipeline is implemented using Python standard libraries (json, csv, time, argparse, sys, datetime, hashlib) for maximum performance, compatibility, and zero-dependency environment compliance.
+# Core ranking pipeline has zero external dependencies and runs on Python standard libraries.
+# The following packages are required only for the Streamlit web sandbox interface:
+streamlit>=1.20.0
+pandas>=1.3.0
