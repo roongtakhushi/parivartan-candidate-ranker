@@ -39,9 +39,10 @@ SERVICE_COMPANIES = {
     "tech mahindra", "mindtree", "mphasis"
 }
 
-def calculate_structured_score(features):
+def calculate_structured_score(features, detail=False):
     """
     Computes raw structured score out of 100 points.
+    If detail=True, returns a dict with the breakdown instead of a scalar.
     """
     # 1. Experience Fit Score (Max 15 points)
     exp = features["years_of_experience"]
@@ -156,64 +157,98 @@ def calculate_structured_score(features):
         loc_score = 2.0
 
     raw_score = exp_score + title_score + skills_score + company_score + loc_score
+
+    if detail:
+        return {
+            "exp_score": exp_score,
+            "title_score": title_score,
+            "vector_score": vector_score,
+            "dl_score": dl_score,
+            "sys_score": sys_score,
+            "skills_score": skills_score,
+            "company_score": company_score,
+            "loc_score": loc_score,
+            "raw_score": raw_score,
+        }
     return raw_score
 
-def calculate_behavior_multiplier(features):
+def calculate_behavior_multiplier(features, detail=False):
     """
     Computes multiplier from platform activity signals.
+    If detail=True, returns a dict with every component instead of a scalar.
     """
-    mult = 1.0
-
     # 1. Last active date
     ref_date = datetime.date(2026, 6, 1)
     last_active = features["last_active_date"]
+    activity_mult = 1.0
+    days_inactive = None
     if last_active:
         try:
             active_date = datetime.date.fromisoformat(last_active)
             days_inactive = (ref_date - active_date).days
             if days_inactive > 180:
-                mult *= 0.6
+                activity_mult = 0.6
             elif days_inactive <= 30:
-                mult *= 1.15
+                activity_mult = 1.15
         except:
             pass
             
     # 2. Recruiter response rate
     resp_rate = features["recruiter_response_rate"]
+    response_mult = 1.0
     if resp_rate >= 0.0:
         if resp_rate < 0.15:
-            mult *= 0.70
+            response_mult = 0.70
         elif resp_rate > 0.80:
-            mult *= 1.15
+            response_mult = 1.15
 
     # 3. Notice period
     notice = features["notice_period_days"]
+    notice_mult = 1.0
     if notice <= 30:
-        mult *= 1.1
+        notice_mult = 1.1
     elif notice > 90:
-        mult *= 0.8
+        notice_mult = 0.8
     elif notice > 60:
-        mult *= 0.9
+        notice_mult = 0.9
 
     # 4. Open to work
+    otw_mult = 1.0
     if features["open_to_work_flag"]:
-        mult *= 1.1
+        otw_mult = 1.1
 
     # 5. Average Tenure (Title-chaser check)
     avg_tenure = features["avg_tenure"]
+    tenure_mult = 1.0
     if avg_tenure < 1.5 and features["years_of_experience"] >= 3.0:
-        mult *= 0.85
+        tenure_mult = 0.85
 
     # 6. Github activity score
     github_score = features["github_activity_score"]
+    github_mult = 1.0
     if github_score > 70:
-        mult *= 1.05
+        github_mult = 1.05
 
     # 7. Endorsements bonus
     endorsements = features["endorsements_received"]
+    endorsement_bonus = 0.0
     if endorsements > 0:
-        mult += min(endorsements, 20) * 0.005
+        endorsement_bonus = min(endorsements, 20) * 0.005
 
+    mult = activity_mult * response_mult * notice_mult * otw_mult * tenure_mult * github_mult + endorsement_bonus
+
+    if detail:
+        return {
+            "activity_mult": activity_mult,
+            "days_inactive": days_inactive,
+            "response_mult": response_mult,
+            "notice_mult": notice_mult,
+            "otw_mult": otw_mult,
+            "tenure_mult": tenure_mult,
+            "github_mult": github_mult,
+            "endorsement_bonus": endorsement_bonus,
+            "combined_mult": mult,
+        }
     return mult
 
 def generate_reasoning(features):

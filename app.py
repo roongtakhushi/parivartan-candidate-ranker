@@ -259,126 +259,34 @@ if candidates:
             if cand["status"] == "✅ Valid":
                 st.markdown("#### Score Component Breakdown")
                 
-                # Manual calculation of components for audit display
-                from ranker import (
-                    VECTOR_SEARCH_SKILLS, NLP_DL_SKILLS, BACKEND_SYSTEMS_SKILLS,
-                    SERVICE_COMPANIES
-                )
-                
-                # 1. Experience Score
-                exp = cand["years_of_experience"]
-                exp_score = 0.0
-                if 5.0 <= exp <= 9.0:
-                    exp_score = 15.0
-                elif 3.0 <= exp < 5.0:
-                    exp_score = 10.0
-                elif 9.0 < exp <= 12.0:
-                    exp_score = 10.0
-                elif exp > 12.0:
-                    exp_score = 5.0
-                
-                # 2. Title Score
-                title = cand["current_title"].lower()
-                title_score = 0.0
-                if any(w in title for w in ["applied ml", "ai engineer", "machine learning engineer", "ml engineer", "nlp engineer", "search engineer", "information retrieval"]):
-                    title_score = 15.0
-                elif "data scientist" in title or "ml researcher" in title:
-                    title_score = 12.0
-                elif any(w in title for w in ["software engineer", "backend", "full stack", "systems engineer"]):
-                    title_score = 10.0
-                    
-                # 3. Skill Score
-                skill_score = 0.0
-                matched_ir = [s for s in cand["skills"] if s in VECTOR_SEARCH_SKILLS]
-                matched_nlp = [s for s in cand["skills"] if s in NLP_DL_SKILLS]
-                matched_sys = [s for s in cand["skills"] if s in BACKEND_SYSTEMS_SKILLS]
-                skill_score += min(len(matched_ir) * 5.0, 15.0)
-                skill_score += min(len(matched_nlp) * 5.0, 15.0)
-                skill_score += min(len(matched_sys) * 5.0, 15.0)
-                
-                # 4. Product Score
-                prod_score = 10.0
-                for job in cand["career_history"]:
-                    comp = job.get("company", "").strip().lower()
-                    if comp:
-                        is_serv = False
-                        for sc in SERVICE_COMPANIES:
-                            if sc in comp:
-                                is_serv = True
-                                break
-                        if is_serv:
-                            prod_score -= 2.0
-                        else:
-                            prod_score += 5.0
-                prod_score = max(0.0, min(prod_score, 15.0))
-                
-                # 5. Location Score
-                loc = cand["location"].strip().lower()
-                loc_score = 0.0
-                if any(m in loc for m in ["noida", "pune", "delhi", "gurgaon", "ncr"]):
-                    loc_score = 10.0
-                elif any(m in loc for m in ["bangalore", "bengaluru", "hyderabad", "mumbai"]):
-                    loc_score = 8.0
-                elif loc:
-                    loc_score = 5.0
-                    
-                raw_total = exp_score + title_score + skill_score + prod_score + loc_score
-                
-                # 6. Multipliers
-                notice = cand["notice_period_days"]
-                notice_mult = 1.0
-                if notice <= 15:
-                    notice_mult = 1.10
-                elif notice <= 30:
-                    notice_mult = 1.05
-                elif notice > 60:
-                    notice_mult = 0.80
-                    
-                act_mult = 1.0
-                # parse inactivity
-                try:
-                    from datetime import datetime
-                    active_dt = datetime.strptime(cand["last_active_date"], "%Y-%m-%d")
-                    ref_dt = datetime(2026, 6, 1)
-                    inactive_months = (ref_dt - active_dt).days / 30.0
-                    if inactive_months > 6:
-                        act_mult = 0.60
-                    elif inactive_months <= 1:
-                        act_mult = 1.10
-                except:
-                    pass
-                    
-                otw_mult = 1.10 if cand["open_to_work_flag"] else 1.0
-                
-                tenure_mult = 1.0
-                if cand["avg_tenure"] < 1.5:
-                    tenure_mult = 0.85
-                    
-                git_mult = 1.0
-                if cand["github_activity_score"] >= 80:
-                    git_mult = 1.05
-                elif cand["github_activity_score"] >= 50:
-                    git_mult = 1.02
-                    
-                total_mult = notice_mult * act_mult * otw_mult * tenure_mult * git_mult
+                # Fetch breakdown from ranker
+                raw_breakdown = calculate_structured_score(cand, detail=True)
+                mult_breakdown = calculate_behavior_multiplier(cand, detail=True)
                 
                 col1, col2 = st.columns(2)
                 with col1:
                     st.markdown("**Structured Alignment Scores (Max 100 Raw Points):**")
-                    st.write(f"- 📅 **Experience Sweet-Spot**: {exp_score} / 15.0")
-                    st.write(f"- 🏷️ **Current Title Match**: {title_score} / 15.0")
-                    st.write(f"- 🛠️ **Technical Skill Depth**: {skill_score} / 45.0")
-                    st.write(f"- 🏢 **Product vs. Service History**: {prod_score} / 15.0")
-                    st.write(f"- 📍 **Location / Relocation**: {loc_score} / 10.0")
-                    st.markdown(f"**Total Raw Score**: **{raw_total}**")
+                    st.write(f"- 📅 **Experience Sweet-Spot**: {raw_breakdown['exp_score']:.1f} / 15.0")
+                    st.write(f"- 🏷️ **Current Title Match**: {raw_breakdown['title_score']:.1f} / 15.0")
+                    st.write(f"- 🛠️ **Technical Skill Depth**: {raw_breakdown['skills_score']:.1f} / 45.0")
+                    st.write(f"  - *Vector Search & IR*: {raw_breakdown['vector_score']:.1f} / 15.0")
+                    st.write(f"  - *Deep Learning & NLP*: {raw_breakdown['dl_score']:.1f} / 15.0")
+                    st.write(f"  - *Backend & Systems*: {raw_breakdown['sys_score']:.1f} / 15.0")
+                    st.write(f"- 🏢 **Product vs. Service History**: {raw_breakdown['company_score']:.1f} / 15.0")
+                    st.write(f"- 📍 **Location / Relocation**: {raw_breakdown['loc_score']:.1f} / 10.0")
+                    st.markdown(f"**Total Raw Score**: **{raw_breakdown['raw_score']:.1f}**")
                 with col2:
                     st.markdown("**Engagement & Reliability Multipliers:**")
-                    st.write(f"- ⏱️ **Notice Period Factor**: {notice_mult}x ({cand['notice_period_days']} days)")
-                    st.write(f"- ⚡ **Inactivity Factor**: {act_mult}x (Last active: {cand['last_active_date']})")
-                    st.write(f"- 🟢 **Open to Work Flag**: {otw_mult}x")
-                    st.write(f"- 🏃‍♂️ **Tenure Factor (Anti-chasing)**: {tenure_mult}x (Avg tenure: {cand['avg_tenure']:.1f} yrs)")
-                    st.write(f"- 🐙 **GitHub Score Factor**: {git_mult}x (GitHub score: {cand['github_activity_score']})")
-                    st.markdown(f"**Combined Scaling Multiplier**: **{total_mult:.4f}x**")
+                    
+                    days_inactive = mult_breakdown['days_inactive']
+                    inactive_str = f"inactive {days_inactive} days" if days_inactive is not None else "no activity date"
+                    st.write(f"- ⏱️ **Notice Period Factor**: {mult_breakdown['notice_mult']:.2f}x ({cand['notice_period_days']} days)")
+                    st.write(f"- ⚡ **Inactivity Factor**: {mult_breakdown['activity_mult']:.2f}x ({inactive_str})")
+                    st.write(f"- 🟢 **Open to Work Flag**: {mult_breakdown['otw_mult']:.2f}x")
+                    st.write(f"- 🏃‍♂️ **Tenure Factor (Anti-chasing)**: {mult_breakdown['tenure_mult']:.2f}x (Avg tenure: {cand['avg_tenure']:.1f} yrs)")
+                    st.write(f"- 🐙 **GitHub Score Factor**: {mult_breakdown['github_mult']:.2f}x (GitHub score: {cand['github_activity_score']})")
+                    st.write(f"- 🏆 **Endorsements Bonus**: +{mult_breakdown['endorsement_bonus']:.3f} (Received: {cand['endorsements_received']})")
+                    st.markdown(f"**Combined Scaling Multiplier**: **{mult_breakdown['combined_mult']:.4f}x**")
                 
                 st.markdown("---")
                 st.write("**Generated Recruiter Justification:**")
