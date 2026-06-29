@@ -25,7 +25,7 @@ team_members:
 # ============================================================================
 # Code and reproducibility
 # ============================================================================
-github_repo: "TODO: To be provided by participant"
+github_repo: "https://github.com/roongtakhushi/parivartan-candidate-ranker"
 sandbox_link: "TODO: To be provided by participant"
 reproduce_command: "python rank.py --candidates \"./judges dataset/candidates.jsonl\" --out \"./parivartan.csv\""
 
