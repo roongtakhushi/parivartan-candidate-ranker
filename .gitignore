@@ -4,7 +4,8 @@ __pycache__/
 *$py.class
 
 # Data files (exclude 487MB candidates dataset)
-judges dataset/
+judges dataset/candidates.jsonl
+judges dataset/candidates.jsonl.gz
 candidates.jsonl
 candidates.jsonl.gz
 
